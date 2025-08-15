@@ -14,10 +14,11 @@ const Footer = () => {
         <div className="md:max-w-sm">
           <img className="h-10" src={assets.logo} alt="logo" />
           <p className="mt-6 text-sm leading-relaxed">
-            Experience the power of AI with{" "}
+            Unlock your creative potential with{" "}
             <span className="text-primary font-semibold">MindPromptAI</span>.
-            Transform your content creation with our premium AI tools — write
-            articles, generate images, and enhance your workflow effortlessly.
+            From generating articles to crafting stunning visuals, our AI tools
+            are built to help you create, innovate, and scale — faster and
+            smarter.
           </p>
         </div>
 
@@ -59,8 +60,8 @@ const Footer = () => {
             </h2>
             <div className="text-sm space-y-3 max-w-xs">
               <p>
-                Get the latest news, articles, and resources — straight to your
-                inbox.
+                Join our community and get fresh AI tips, inspiration, and
+                updates delivered right to your inbox.
               </p>
               <div className="flex items-center gap-2 pt-2">
                 <input

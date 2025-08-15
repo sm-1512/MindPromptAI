@@ -6,45 +6,61 @@ const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-4 sm:px-20 xl:px-32 overflow-hidden bg-gradient-to-b from-indigo-50 via-white to-white">
-      {/* Decorative gradient blobs */}
-      <div className="absolute top-[-15%] left-[-15%] w-72 h-72 bg-primary/10 rounded-full blur-3xl opacity-50 animate-pulse" />
-      <div className="absolute bottom-[-15%] right-[-15%] w-72 h-72 bg-pink-300/10 rounded-full blur-3xl opacity-50 animate-pulse" />
+    <section className="relative min-h-screen flex flex-col-reverse md:flex-row items-center justify-center px-6 md:px-20 overflow-hidden bg-gradient-to-br from-indigo-100 via-white to-pink-50">
+      {/* Background angled gradient */}
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-primary/5 via-transparent to-pink-200/10 -z-10" />
 
-      {/* Bottom fade for smooth transition */}
-      <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-
-      {/* Main content */}
-      <div className="relative text-center z-10">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl 2xl:text-7xl font-extrabold leading-tight bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-          Create amazing content <br />
-          with <span className="text-primary">AI tools</span>
+      {/* Left Content */}
+      <div className="flex-1 text-center md:text-left space-y-6">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
+          Your Ideas,
+          <span className="bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
+            Supercharged by AI
+          </span>
         </h1>
-        <p className="mt-6 max-w-xs sm:max-w-lg 2xl:max-w-xl mx-auto text-sm sm:text-base text-gray-600">
-          Transform your content creation with our suite of premium AI tools.
-          Write articles, generate images, and enhance your workflow.
+        <p className="text-gray-600 max-w-lg mx-auto md:mx-0 text-sm sm:text-base">
+          Create articles, images, and more with our cutting-edge AI tools. Save
+          time, boost productivity, and bring your ideas to life.
         </p>
+
+        {/* Buttons */}
+        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+          <button
+            onClick={() => navigate("/ai")}
+            className="px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-200"
+          >
+            Start Creating
+          </button>
+          <button className="px-8 py-3 rounded-xl bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 transition-transform duration-200 font-semibold">
+            Watch Demo
+          </button>
+        </div>
+
+        {/* Trusted By */}
+        <div className="flex items-center gap-4 mt-6 justify-center md:justify-start">
+          <img src={assets.user_group} alt="Users" className="h-8 w-auto" />
+          <span className="px-4 py-1 bg-gray-100 rounded-full text-gray-700 text-sm font-medium">
+            Trusted by 10k+ creators
+          </span>
+        </div>
       </div>
 
-      {/* Buttons */}
-      <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm sm:text-base">
-        <button
-          onClick={() => navigate("/ai")}
-          className="px-10 py-3 rounded-lg bg-gradient-to-r from-primary to-pink-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200"
-        >
-          Start Creating
-        </button>
-        <button className="px-10 py-3 rounded-lg bg-white/60 backdrop-blur-lg border border-gray-200 hover:scale-105 hover:shadow-md transition-all duration-200">
-          Watch Demo
-        </button>
-      </div>
+      {/* Right Illustration */}
+      <div className="flex-1 flex items-center justify-center relative">
+        {/* Decorative gradient blob */}
+        <div className="absolute -top-16 -right-16 w-64 h-64 bg-gradient-to-br from-primary/20 to-pink-300/20 rounded-full blur-3xl z-0" />
 
-      {/* Trusted by section */}
-      <div className="flex items-center gap-3 mt-10 mx-auto text-gray-600">
-        <img src={assets.user_group} alt="Users" className="h-8" />
-        <span className="text-sm sm:text-base">Trusted by 10k+ people</span>
+        {/* Illustration without card box */}
+        <img
+          src={assets.hero_image}
+          alt="AI Tools"
+          className="relative z-10 w-80 md:w-96 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+        />
+
+        {/* Extra subtle floating shape */}
+        <div className="absolute bottom-10 left-10 w-20 h-20 bg-primary/10 rounded-full blur-2xl z-0" />
       </div>
-    </div>
+    </section>
   );
 };
 

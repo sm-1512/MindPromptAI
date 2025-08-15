@@ -8,7 +8,7 @@ const Testimonial = () => {
       name: "John Doe",
       title: "Marketing Director, TechCorp",
       content:
-        "ContentAI has revolutionized our content workflow. The quality of the articles is outstanding, and it saves us hours of work every week.",
+        "Using ContentAI feels like having a full creative team in my pocket. The ideas, the writing, the polish — it’s all next-level.",
       rating: 4,
     },
     {
@@ -17,7 +17,7 @@ const Testimonial = () => {
       name: "Jane Smith",
       title: "Content Creator, TechCorp",
       content:
-        "ContentAI has made our content creation process effortless. The AI tools have helped us produce high-quality content faster than ever before.",
+        "I can go from concept to publish-ready content in minutes, not days. It’s become my go-to tool for everything I create.",
       rating: 5,
     },
     {
@@ -26,35 +26,47 @@ const Testimonial = () => {
       name: "David Lee",
       title: "Content Writer, TechCorp",
       content:
-        "ContentAI has transformed our content creation process. The AI tools have helped us produce high-quality content faster than ever before.",
+        "What impresses me most is how natural and engaging the AI’s writing feels. My workflow has never been this smooth.",
       rating: 4,
     },
   ];
 
   return (
-    <div className="px-4 sm:px-20 xl:px-32 py-24">
-      <div className="text-center">
-        <h2 className="text-slate-700 text-[42px] font-semibold">
+    <div className="relative px-4 sm:px-20 xl:px-32 py-24">
+      {/* Soft gradient background */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-indigo-50/20 to-white">
+        <div className="absolute top-[-15%] left-[-10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[300px] h-[300px] bg-pink-300/10 rounded-full blur-3xl opacity-50" />
+      </div>
+
+      {/* Section header */}
+      <div className="text-center max-w-2xl mx-auto">
+        <h2 className="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
           Loved by Creators
         </h2>
-        <p className="text-gray-500 max-w-lg mx-auto">
-          Don't just take our word for it. Here's what our users are saying.
+        <p className="text-gray-600 mt-4 text-base sm:text-lg">
+          Hear directly from the creators, marketers, and innovators who’ve
+          transformed their work with ContentAI.
         </p>
       </div>
-      <div className="flex flex-wrap mt-10 justify-center">
+
+      {/* Testimonials */}
+      <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {dummyTestimonialData.map((testimonial, index) => (
           <div
             key={index}
-            className="p-8 m-4 max-w-xs rounded-lg bg-[#FDFDFE] shadow-lg border border-gray-100 hover:-translate-y-1 transition duration-300 cursor-pointer"
+            className="p-8 rounded-2xl bg-white/70 shadow-md border border-gray-100 hover:shadow-lg hover:border-primary/20 
+            hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
           >
+            {/* Star rating */}
             <div className="flex items-center gap-1">
               {Array(5)
                 .fill(0)
-                .map((_, index) => (
+                .map((_, starIndex) => (
                   <img
-                    key={index}
+                    key={starIndex}
                     src={
-                      index < testimonial.rating
+                      starIndex < testimonial.rating
                         ? assets.star_icon
                         : assets.star_dull_icon
                     }
@@ -63,18 +75,23 @@ const Testimonial = () => {
                   />
                 ))}
             </div>
-            <p className="text-gray-500 text-sm my-5">
-              "{testimonial.content}"
+
+            {/* Review text */}
+            <p className="text-gray-600 text-sm mt-5 mb-6 italic leading-relaxed">
+              “{testimonial.content}”
             </p>
-            <hr className="mb-5 border-gray-300" />
+
+            <hr className="mb-6 border-gray-200" />
+
+            {/* Reviewer info */}
             <div className="flex items-center gap-4">
               <img
                 src={testimonial.image}
-                className="w-12 object-contain rounded-full"
-                alt=""
+                className="w-12 h-12 object-cover rounded-full border border-gray-200"
+                alt={testimonial.name}
               />
-              <div className="text-sm text-gray-600">
-                <h3 className="font-medium">{testimonial.name}</h3>
+              <div className="text-sm text-gray-700">
+                <h3 className="font-semibold">{testimonial.name}</h3>
                 <p className="text-xs text-gray-500">{testimonial.title}</p>
               </div>
             </div>
