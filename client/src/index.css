@@ -11,3 +11,12 @@
 html, body {
   overflow-x: hidden;
 }
+
+.reset-tw, .reset-tw *{
+  all: revert !important;
+}
+
+.cl-drawerRoot {
+  z-index: 9999 !important;
+  position: relative;       
+}
