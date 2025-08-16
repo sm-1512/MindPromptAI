@@ -1,30 +1,26 @@
-import { Hash, Sparkles } from 'lucide-react';
-import React, {useState} from 'react'
+import { Hash, Sparkles } from "lucide-react";
+import React, { useState } from "react";
 
 const BlogTitles = () => {
+  const blogCategories = [
+    "General",
+    "Technology",
+    "Business",
+    "Health",
+    "Lifestyle",
+    "Education",
+    "Travel",
+    "Food",
+  ];
 
-     const blogCategories = [
-       "General",
-       "Technology",
-       "Business",
-       "Health",
-       "Lifestyle",
-       "Education",
-       "Travel",
-       "Food",
-     ];
+  const [selectedCategory, setSelectedCategory] = useState("General");
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState("");
 
-  
-    const [selectedCategory, setSelectedCategory] = useState("General");
-    const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [content, setContent] = useState("");
-  
-    const onSubmitHandler = async (e) => {
-      e.preventDefault();
-    };
-
-
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+  };
 
   return (
     <div className="h-full p-6 bg-gray-50 text-slate-700">
@@ -35,7 +31,7 @@ const BlogTitles = () => {
           className="flex flex-col p-6 bg-white rounded-xl border border-gray-200 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            <Sparkles className="w-6 h-6 text-blue-600" />
+            <Sparkles className="w-6 h-6 text-teal-600" />
             <h1 className="text-xl font-semibold">AI Title Generator</h1>
           </div>
 
@@ -43,7 +39,7 @@ const BlogTitles = () => {
           <input
             onChange={(e) => setInput(e.target.value)}
             type="text"
-            className="w-full p-3 mt-2 text-sm rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full p-3 mt-2 text-sm rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:outline-none"
             placeholder="The future of artificial intelligence is..."
             required
           />
@@ -56,7 +52,7 @@ const BlogTitles = () => {
                 key={item}
                 className={`px-4 py-1.5 rounded-full text-xs font-medium cursor-pointer transition ${
                   selectedCategory === item
-                    ? "bg-blue-600 text-white shadow-sm"
+                    ? "bg-teal-600 text-white shadow-sm"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -67,7 +63,7 @@ const BlogTitles = () => {
 
           <button
             disabled={loading}
-            className="w-full flex justify-center items-center gap-2 mt-8 py-3 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-blue-600 to-indigo-500 hover:opacity-90 transition"
+            className="w-full flex justify-center items-center gap-2 mt-8 py-3 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-teal-500 to-emerald-600 hover:opacity-90 transition"
           >
             {loading ? (
               <span className="w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
@@ -81,7 +77,7 @@ const BlogTitles = () => {
         {/* Right Panel */}
         <div className="flex flex-col p-6 bg-white rounded-xl border border-gray-200 shadow-sm h-full">
           <div className="flex items-center gap-3 mb-4">
-            <Hash className="w-5 h-5 text-blue-600" />
+            <Hash className="w-5 h-5 text-teal-600" />
             <h1 className="text-xl font-semibold">Generated Titles</h1>
           </div>
 
@@ -103,6 +99,6 @@ const BlogTitles = () => {
       </div>
     </div>
   );
-}
+};
 
-export default BlogTitles
+export default BlogTitles;
