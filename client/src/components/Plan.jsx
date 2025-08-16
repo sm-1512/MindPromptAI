@@ -21,8 +21,7 @@ const Plan = () => {
       </div>
 
       {/* Decorative Glow */}
-      <div className="absolute -top-20 -right-20 w-72 h-72 bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
-      
+      <div className="absolute top-0 right-0 w-60 h-60 bg-primary/20 blur-[100px] rounded-full pointer-events-none" />
     </div>
   );
 };

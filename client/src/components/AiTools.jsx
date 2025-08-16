@@ -8,11 +8,11 @@ const AiTools = () => {
   const { user } = useUser();
 
   return (
-    <section className="relative px-4 sm:px-20 xl:px-32 py-24">
+    <section className="relative px-4 sm:px-20 xl:px-32 py-24 overflow-hidden">
       {/* Matching Hero-style background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden bg-gradient-to-b from-white via-indigo-50/30 to-white">
-        <div className="absolute top-[-10%] left-[-10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl opacity-50 animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] bg-pink-300/10 rounded-full blur-3xl opacity-50 animate-pulse" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-indigo-50/30 to-white overflow-hidden rounded-xl" >
+        <div className="absolute top-0 left-0 w-[220px] h-[220px] bg-primary/10 rounded-full blur-3xl opacity-40" />
+        <div className="absolute bottom-0 right-0 w-[260px] h-[260px] bg-pink-300/10 rounded-full blur-3xl opacity-40" />
       </div>
 
       {/* Title */}

@@ -6,10 +6,7 @@ const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative min-h-screen flex flex-col-reverse md:flex-row items-center justify-center px-6 md:px-20 overflow-hidden bg-gradient-to-br from-indigo-100 via-white to-pink-50">
-      {/* Background angled gradient */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-primary/5 via-transparent to-pink-200/10 -z-10" />
-
+    <section className="relative min-h-screen flex flex-col-reverse md:flex-row items-center justify-center px-6 md:px-20 bg-gradient-to-br from-indigo-100 via-white to-pink-50 overflow-hidden">
       {/* Left Content */}
       <div className="flex-1 text-center md:text-left space-y-6">
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
@@ -31,7 +28,7 @@ const Hero = () => {
           >
             Start Creating
           </button>
-          <button className="px-8 py-3 rounded-xl bg-white/70 backdrop-blur-md border border-gray-200 hover:scale-105 transition-transform duration-200 font-semibold">
+          <button className="px-8 py-3 rounded-xl bg-white border border-gray-200 hover:scale-105 transition-transform duration-200 font-semibold">
             Watch Demo
           </button>
         </div>
@@ -46,19 +43,12 @@ const Hero = () => {
       </div>
 
       {/* Right Illustration */}
-      <div className="flex-1 flex items-center justify-center relative">
-        {/* Decorative gradient blob */}
-        <div className="absolute -top-16 -right-16 w-64 h-64 bg-gradient-to-br from-primary/20 to-pink-300/20 rounded-full blur-3xl z-0" />
-
-        {/* Illustration without card box */}
+      <div className="flex-1 flex items-center justify-center">
         <img
           src={assets.hero_image}
           alt="AI Tools"
-          className="relative z-10 w-80 md:w-96 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+          className="max-w-[90%] md:max-w-md object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
         />
-
-        {/* Extra subtle floating shape */}
-        <div className="absolute bottom-10 left-10 w-20 h-20 bg-primary/10 rounded-full blur-2xl z-0" />
       </div>
     </section>
   );

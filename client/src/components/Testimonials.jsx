@@ -35,8 +35,8 @@ const Testimonial = () => {
     <div className="relative px-4 sm:px-20 xl:px-32 py-24">
       {/* Soft gradient background */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-indigo-50/20 to-white">
-        <div className="absolute top-[-15%] left-[-10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-3xl opacity-50" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[300px] h-[300px] bg-pink-300/10 rounded-full blur-3xl opacity-50" />
+        <div className="absolute top-10 left-10 w-[220px] h-[220px] bg-primary/10 rounded-full blur-3xl opacity-40" />
+        <div className="absolute bottom-10 right-10 w-[220px] h-[220px] bg-pink-300/10 rounded-full blur-3xl opacity-40" />
       </div>
 
       {/* Section header */}

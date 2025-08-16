@@ -5,9 +5,8 @@ const Footer = () => {
   return (
     <footer className="relative px-6 md:px-16 lg:px-24 xl:px-32 pt-12 w-full text-gray-500 mt-20 bg-gradient-to-b from-white via-indigo-50/30 to-purple-50/20">
       {/* Decorative Blobs */}
-      <div className="absolute top-[-80px] left-[-80px] w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-[-80px] right-[-80px] w-80 h-80 bg-pink-300/10 rounded-full blur-3xl -z-10" />
-
+      <div className="absolute top-0 left-0 w-56 h-56 bg-primary/10 rounded-full blur-3xl -z-10" />
+      <div className="absolute bottom-10 right-10 w-48 h-48 bg-pink-300/10 rounded-full blur-3xl -z-10" />
       {/* Main Footer Content */}
       <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-gray-300/30 pb-10">
         {/* Logo & Description */}
@@ -77,7 +76,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-
       {/* Bottom Text */}
       <p className="pt-6 text-center text-xs md:text-sm text-gray-500">
         © 2025 MindPromptAI. All Rights Reserved.

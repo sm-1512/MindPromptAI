@@ -8,3 +8,6 @@
 @theme{
   --color-primary: #111827;
 }
+html, body {
+  overflow-x: hidden;
+}
