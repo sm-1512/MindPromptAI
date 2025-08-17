@@ -22,6 +22,8 @@ const navItems = [
   { to: "/ai/remove-object", label: "Remove Object", Icon: Scissors },
   { to: "/ai/review-resume", label: "Review Resume", Icon: FileText },
   { to: "/ai/cover-letter-generator", label: "Cover Letter Generator", Icon: FileText },
+  { to: "/ai/interview-questions-generator", label: "Interview Questions", Icon: FileText },
+  { to: "/ai/hr-questions-generator", label: "HR Questions", Icon: FileText },
   { to: "/ai/community", label: "Community", Icon: Users },
 ];
 
@@ -31,49 +33,51 @@ const Sidebar = ({ sidebar, setSidebar }) => {
 
   return (
     <div
-      className={`w-64 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 flex flex-col justify-between shadow-sm max-sm:absolute top-14 bottom-0 ${
+      className={`w-64 h-full bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 flex flex-col justify-between shadow-sm max-sm:absolute top-14 bottom-0 ${
         sidebar ? "translate-x-0" : "max-sm:-translate-x-full"
       } transition-all duration-300 ease-in-out`}
     >
       {/* Top Section */}
-      <div className="my-8 w-full">
-        <img
-          src={user.imageUrl}
-          alt="User avatar"
-          className="w-16 h-16 rounded-full mx-auto shadow-md"
-        />
-        <h1 className="mt-3 text-center font-semibold text-gray-800">
-          {user.fullName}
-        </h1>
+      <div className="flex-1 overflow-y-auto">
+        <div className="my-8 w-full">
+          <img
+            src={user.imageUrl}
+            alt="User avatar"
+            className="w-16 h-16 rounded-full mx-auto shadow-md"
+          />
+          <h1 className="mt-3 text-center font-semibold text-gray-800">
+            {user.fullName}
+          </h1>
 
-        {/* Nav Items */}
-        <div className="px-6 mt-8 text-sm font-medium space-y-1">
-          {navItems.map(({ to, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === "/ai"}
-              onClick={() => setSidebar(false)}
-              className={({ isActive }) =>
-                `px-3.5 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-200 ${
-                  isActive
-                    ? "bg-indigo-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon
-                    className={`w-4 h-4 ${
-                      isActive ? "text-white" : "text-gray-500"
-                    }`}
-                  />
-                  {label}
-                </>
-              )}
-            </NavLink>
-          ))}
+          {/* Nav Items */}
+          <div className="px-6 mt-8 text-sm font-medium space-y-1">
+            {navItems.map(({ to, label, Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === "/ai"}
+                onClick={() => setSidebar(false)}
+                className={({ isActive }) =>
+                  `px-3.5 py-2.5 flex items-center gap-3 rounded-xl transition-all duration-200 ${
+                    isActive
+                      ? "bg-indigo-600 text-white shadow-md"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon
+                      className={`w-4 h-4 ${
+                        isActive ? "text-white" : "text-gray-500"
+                      }`}
+                    />
+                    {label}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </div>
         </div>
       </div>
 

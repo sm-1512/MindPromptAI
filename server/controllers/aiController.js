@@ -445,10 +445,209 @@ export const coverLetterGenerator = async (req, res) => {
       content,
     });
   } catch (error) {
-    console.error("Resume review error:", error);
+    console.error("Cover Letter Generator error:", error);
     return res.status(500).json({
       success: false,
-      message: "An error occurred while reviewing the resume.",
+      message: "An error occurred generating cover letter.",
+    });
+  } finally {
+    // 8. Clean up uploaded file if necessary
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path); // remove temp file to avoid clutter
+    }
+  }
+}
+
+export const interviewQuestionsGenerator = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { plan } = req;
+    const resume = req.file;
+
+    // 1. Check if user has premium plan
+    if (plan !== "premium") {
+      return res.status(403).json({
+        success: false,
+        message: "This feature is only available for premium users.",
+      });
+    }
+
+    // 2. Validate resume file
+    if (!resume) {
+      return res.status(400).json({
+        success: false,
+        message: "No resume file uploaded.",
+      });
+    }
+
+    if (resume.size > 5 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: "Resume file size exceeds the 5MB limit.",
+      });
+    }
+
+    if (!resume.mimetype.includes("pdf")) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file type. Please upload a PDF resume.",
+      });
+    }
+
+    // 3. Extract text from PDF
+    const dataBuffer = fs.readFileSync(resume.path);
+    const pdfData = await pdf(dataBuffer);
+
+    // 4. Create AI prompt
+      const prompt = `
+        Act as a Senior Hiring Manager or a Technical Interviewer preparing for an interview. Your task is to generate a set of insightful, high-level interview questions based ONLY on the "PROJECTS" section of the provided resume.
+
+        For each project listed in the resume, generate a list of questions organized into the following three categories:
+
+        **1. Project Overview Questions (Basic):**
+          - Ask about the project's goal, the candidate's specific role, and their individual contributions. These questions should be high-level and serve as an icebreaker.
+
+        **2. Technical Deep-Dive Questions (Intermediate):**
+          - Focus on the "Tech Stack" mentioned for the project. Ask specific questions about why certain technologies (e.g., React, Node.js, MongoDB, Python) were chosen and how they were implemented.
+
+        **3. Problem-Solving and Architectural Questions (Advanced):**
+          - Ask about the most significant challenges faced during the project, any trade-offs that were made, and what the candidate would do differently now. Probe their understanding of system design, scalability, and architectural decisions.
+
+        The questions should be open-ended and designed to reveal the depth of the candidate's technical knowledge and problem-solving skills.
+
+        **Resume Content:**
+        ${pdfData.text}
+        `;
+
+
+    // 5. Generate AI response
+    const response = await AI.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 3000,
+    });
+
+    const content = response.choices[0].message.content;
+
+    // 6. Save to database
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type) 
+      VALUES (${userId}, 'Interview Questions Generator', ${content}, 'interview-questions-generator')
+    `;
+
+    // 7. Return success response
+    return res.status(200).json({
+      success: true,
+      content,
+    });
+  } catch (error) {
+    console.error("Interview Questions Generator error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while generating questions.",
+    });
+  } finally {
+    // 8. Clean up uploaded file if necessary
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path); // remove temp file to avoid clutter
+    }
+  }
+}
+
+export const hrQuestionsGenerator = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { plan } = req;
+    const resume = req.file;
+
+    // 1. Check if user has premium plan
+    if (plan !== "premium") {
+      return res.status(403).json({
+        success: false,
+        message: "This feature is only available for premium users.",
+      });
+    }
+
+    // 2. Validate resume file
+    if (!resume) {
+      return res.status(400).json({
+        success: false,
+        message: "No resume file uploaded.",
+      });
+    }
+
+    if (resume.size > 5 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: "Resume file size exceeds the 5MB limit.",
+      });
+    }
+
+    if (!resume.mimetype.includes("pdf")) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file type. Please upload a PDF resume.",
+      });
+    }
+
+    // 3. Extract text from PDF
+    const dataBuffer = fs.readFileSync(resume.path);
+    const pdfData = await pdf(dataBuffer);
+
+    // 4. Create AI prompt
+      const prompt = `
+        Act as a Senior HR Manager preparing for a behavioral interview. Your primary goal is to assess a candidate's soft skills, cultural fit, and motivation.
+
+        Your task is to generate a thoughtful set of HR and behavioral interview questions based on the entirety of the provided resume. The questions should be personalized to the candidate's specific background.
+
+        Please organize the questions into the following categories:
+
+        **1. Motivation and Career Goals:**
+          - Create questions that explore why the candidate chose their field, what they are passionate about, and what their long-term career aspirations are.
+
+        **2. Behavioral Questions (Based on Experience & Projects):**
+          - Analyze the "Professional Experience" and "Projects" sections. Formulate questions that ask the candidate to describe specific situations from their past. These questions should start with phrases like "Tell me about a time when..." or "Describe a situation where...".
+          - **For example:** If the resume mentions a project, ask: "Your 'MindPromptAl' project mentions gaining 20+ users. Tell me about the biggest challenge you faced in attracting those first users."
+
+        **3. Teamwork and Collaboration:**
+          - Based on their experiences, create questions to understand how they work in a team, handle disagreements, and contribute to a collaborative environment.
+          - **For example:** "Your research paper lists you as the 'First and Corresponding Author.' Can you describe how you collaborated with others during this research?"
+
+        **4. Problem-Solving and Adaptability:**
+          - Formulate questions that probe the candidate's ability to handle pressure, overcome unexpected challenges, and adapt to new situations. Use their past roles or projects as a backdrop.
+
+        **Resume Content:**
+        ${pdfData.text}
+        `;
+
+
+    // 5. Generate AI response
+    const response = await AI.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 3000,
+    });
+
+    const content = response.choices[0].message.content;
+
+    // 6. Save to database
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type) 
+      VALUES (${userId}, 'HR Questions Generator', ${content}, 'hr-questions-generator')
+    `;
+
+    // 7. Return success response
+    return res.status(200).json({
+      success: true,
+      content,
+    });
+  } catch (error) {
+    console.error("HR Questions Generator error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while generating questions.",
     });
   } finally {
     // 8. Clean up uploaded file if necessary
