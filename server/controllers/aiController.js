@@ -361,3 +361,99 @@ export const resumeReview = async (req, res) => {
     }
   }
 };
+
+export const coverLetterGenerator = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { plan } = req;
+    const { jobDescription, companyName, jobTitle } = req.body;
+    const resume = req.file;
+
+    // 1. Check if user has premium plan
+    if (plan !== "premium") {
+      return res.status(403).json({
+        success: false,
+        message: "This feature is only available for premium users.",
+      });
+    }
+
+    // 2. Validate resume file
+    if (!resume) {
+      return res.status(400).json({
+        success: false,
+        message: "No resume file uploaded.",
+      });
+    }
+
+    if (resume.size > 5 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: "Resume file size exceeds the 5MB limit.",
+      });
+    }
+
+    if (!resume.mimetype.includes("pdf")) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file type. Please upload a PDF resume.",
+      });
+    }
+
+    // 3. Extract text from PDF
+    const dataBuffer = fs.readFileSync(resume.path);
+    const pdfData = await pdf(dataBuffer);
+
+    // 4. Create AI prompt
+    const prompt = `
+          Act as an expert Career Coach and professional writer. Your task is to write a compelling and professional cover letter based on the provided resume and job description.
+
+          The cover letter must be:
+          1.  **Tailored:** Specifically address the ${companyName} and the ${jobTitle} role.
+          2.  **Structured:** Follow a clear introduction, body, and conclusion format.
+          3.  **Targeted:** In the body paragraphs, highlight 2-3 key experiences or skills from the resume that directly match the most important requirements listed in the job description.
+          4.  **Professional:** Maintain a confident and engaging tone throughout.
+          5.  **Concise:** Keep the content to about three or four paragraphs, fitting comfortably on one page.
+          6.  **Authentic:** Do NOT invent or exaggerate skills or experiences not found in the resume.
+
+          Here is the necessary information:
+
+          **Candidate's Resume:**
+          ${pdfData.text}
+
+          **Job Description for the Role:**
+          ${jobDescription}
+          `;
+    // 5. Generate AI response
+    const response = await AI.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
+
+    const content = response.choices[0].message.content;
+
+    // 6. Save to database
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type) 
+      VALUES (${userId}, 'Cover Letter Generator', ${content}, 'cover-letter-generator')
+    `;
+
+    // 7. Return success response
+    return res.status(200).json({
+      success: true,
+      content,
+    });
+  } catch (error) {
+    console.error("Resume review error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while reviewing the resume.",
+    });
+  } finally {
+    // 8. Clean up uploaded file if necessary
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path); // remove temp file to avoid clutter
+    }
+  }
+}

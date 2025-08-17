@@ -13,6 +13,7 @@ import Community from "./pages/Community";
 import { useAuth } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import {Toaster} from 'react-hot-toast';
+import CoverLetterGenerator from './pages/CoverLetterGenerator';
 
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="remove-background" element={<RemoveBackground />} />
           <Route path="remove-object" element={<RemoveObject />} />
           <Route path="review-resume" element={<ReviewResume />} />
+          <Route path="cover-letter-generator" element={<CoverLetterGenerator />} />
           <Route path="community" element={<Community />} />
         </Route>
       </Routes>
