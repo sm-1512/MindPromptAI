@@ -74,7 +74,7 @@ export const generateBlogTitle = async (req, res) => {
       });
     }
 
-    // 2. Call AI model to generate article
+    // 2. Call AI model to generate title
     const response = await AI.chat.completions.create({
       model: "gemini-2.0-flash",
       messages: [{ role: "user", content: prompt }],
@@ -127,7 +127,7 @@ export const generateImage = async (req, res) => {
       });
     }
 
-    // 2. Call AI model to generate article
+    // 2. Call AI model to generate image
     const formData = new FormData();
     formData.append("prompt", prompt);
     const { data } = await axios.post(
@@ -162,3 +162,47 @@ export const generateImage = async (req, res) => {
     });
   }
 };
+
+export const removeImageBackground = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const {image} = req.file;
+    const { plan } = req; // values set in your auth middleware
+
+    //No free_usage variables because it is only available for premium users
+
+    // 1. Check usage limits for free users
+    if (plan !== "premium") {
+      return res.status(403).json({
+        success: false,
+        message: "This feature is only available for premium users.",
+      });
+    }
+
+    // 2. Call AI model to remove background
+    const {secure_url} = await cloudinary.uploader.upload(image.path, {
+            transformation: [
+                {
+                    effect: 'background_removal',
+                    background_removal: 'remove_the_background'
+                }
+            ]
+        })
+
+    // 3. Save creation to DB
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type) 
+      VALUES (${userId}, 'Remove Background from image' , ${secure_url}, 'image')`;
+
+    // 4. Send response
+    return res.status(200).json({ success: true, secure_url });
+  } catch (error) {
+    console.error("generateTitle error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while generating the image.",
+      error: error.message,
+    });
+  }
+};
+
