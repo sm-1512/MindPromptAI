@@ -1,6 +1,6 @@
 import { clerkClient } from "@clerk/express";
 
-const auth = async (req, res, next) => {
+export const auth = async (req, res, next) => {
   try {
     const { userId, has } = req.auth();
 
@@ -32,4 +32,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-export default auth;
+
