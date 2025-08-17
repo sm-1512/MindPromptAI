@@ -1,6 +1,10 @@
 import { Scissors, Sparkles } from "lucide-react";
 import React, { useState } from "react";
-import Markdown from "react-markdown";
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const RemoveObject = () => {
   const [input, setInput] = useState("");
@@ -8,8 +12,35 @@ const RemoveObject = () => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
+  const { getToken } = useAuth();
+  
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    if (object.split(" ").length > 1) {
+      return toast("Please enter only one object name");
+    }
+
+    const formData = new FormData();
+    formData.append("image", input);
+    formData.append("object", object);
+
+    try {
+      const { data } = await axios.post("/api/ai/remove-image-object", formData, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`}});
+
+      if (data.success) {
+        setContent(data.content);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -83,9 +114,11 @@ const RemoveObject = () => {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto pr-2 text-sm text-slate-700">
-              <div className="reset-tw">
-                <Markdown>{content}</Markdown>
-              </div>
+              <img
+                src={content}
+                alt="Generated Image"
+                className="max-w-full rounded-lg shadow-md"
+              />
             </div>
           )}
         </div>

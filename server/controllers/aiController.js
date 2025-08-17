@@ -4,7 +4,7 @@ import { clerkClient } from "@clerk/express";
 import axios from "axios";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import pdf from 'pdf-parse/lib/pdf-parse.js'
+import pdf from "pdf-parse/lib/pdf-parse.js";
 
 const AI = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -168,7 +168,7 @@ export const generateImage = async (req, res) => {
 export const removeImageBackground = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { image } = req.file;
+    const image = req.file;
     const { plan } = req; // values set in your auth middleware
 
     //No free_usage variables because it is only available for premium users
@@ -197,7 +197,7 @@ export const removeImageBackground = async (req, res) => {
       VALUES (${userId}, 'Remove Background from image' , ${secure_url}, 'image')`;
 
     // 4. Send response
-    return res.status(200).json({ success: true, secure_url });
+    return res.status(200).json({ success: true, content: secure_url });
   } catch (error) {
     console.error("generateTitle error:", error);
     return res.status(500).json({
@@ -212,7 +212,7 @@ export const removeImageObject = async (req, res) => {
   try {
     const { userId } = req.auth();
     const { object } = req.body;
-    const { image } = req.file;
+    const image = req.file;
     const { plan } = req; // values set in your auth middleware
 
     //No free_usage variables because it is only available for premium users
@@ -239,7 +239,7 @@ export const removeImageObject = async (req, res) => {
       VALUES (${userId}, ${`Removed ${object}`} , ${imageUrl}, 'image')`;
 
     // 4. Send response
-    return res.status(200).json({ success: true, secure_url: imageUrl });
+    return res.status(200).json({ success: true, content: imageUrl });
   } catch (error) {
     console.error("generateTitle error:", error);
     return res.status(500).json({
@@ -250,11 +250,11 @@ export const removeImageObject = async (req, res) => {
   }
 };
 
-
 export const resumeReview = async (req, res) => {
   try {
     const { userId } = req.auth();
     const { plan } = req;
+    const { targetRole, targetIndustry } = req.body;
     const resume = req.file;
 
     // 1. Check if user has premium plan
@@ -293,37 +293,39 @@ export const resumeReview = async (req, res) => {
 
     // 4. Create AI prompt
     const prompt = `
-        Act as an expert Career Coach and professional Resume Reviewer. Your task is to conduct a comprehensive review of the following resume.
+        Act as an expert Career Coach and professional Resume Reviewer. Your task is to conduct a comprehensive review of the following resume. The candidate is targeting a ${targetRole} role within the ${targetIndustry} industry.
 
-        Please provide a detailed, constructive critique organized into the following sections. Ensure your feedback is specific, actionable, and tailored.
+        Please provide a detailed, constructive critique organized into the following sections. Ensure your feedback is specific, actionable, and tailored to the provided target role.
 
         **1. First Impressions & ATS Compatibility:**
-        - Provide a brief, overall impression of the resume. Is it professional, clear, and easy to read?
-        - Analyze its compatibility with Applicant Tracking Systems (ATS). Comment on formatting, keywords, and overall structure.
+          - Provide a brief, overall impression of the resume. Is it professional, clear, and easy to read?
+          - Analyze its compatibility with Applicant Tracking Systems (ATS). Comment on formatting, keywords, and overall structure.
 
         **2. Section-by-Section Analysis:**
-        - **Contact Information:** Is it complete and professional?
-        - **Skills:** Are the skills relevant and well-organized? Is there a good mix of languages, frameworks, and tools?
-        - **Professional Experience:**
+          - **Contact Information:** Is it complete and professional?
+          - **Skills:** Are the skills relevant and well-organized for a ${targetRole}? Is there a good mix of languages, frameworks, and tools?
+          - **Professional Experience:**
             - Are the descriptions written with strong, impactful action verbs?
-            - Are achievements quantified with specific metrics or results (e.g., "Increased X by Y%", "Reduced Z by N hours")??
-        - **Projects:**
+            - Are achievements quantified with specific metrics or results (e.g., "Increased X by Y%", "Reduced Z by N hours")?
+            - How well does the experience align with the responsibilities of a ${targetRole}?
+          - **Projects:**
             - Do the project descriptions clearly state the technologies used (Tech Stack)?
-            - Do they effectively demonstrate skills relevant?
+            - Do they effectively demonstrate skills relevant to the target role?
             - Are links to GitHub or live demos included and valuable?
-        - **Education & Certifications:** Is this section clear, concise, and supportive of the candidate's goals?
+          - **Education & Certifications:** Is this section clear, concise, and supportive of the candidate's goals?
 
         **3. Key Strengths:**
-        - Based on the analysis, list the top 3-5 strengths of this resume that make the candidate a strong applicant.
+          - Based on the analysis, list the top 3-5 strengths of this resume that make the candidate a strong applicant for a ${targetRole} position.
 
         **4. Actionable Areas for Improvement:**
-        - Provide a numbered list of the most critical, actionable recommendations for improvement. For each point, explain *why* the change is needed and provide a clear "before and after" example if possible.
+          - Provide a numbered list of the most critical, actionable recommendations for improvement. For each point, explain *why* the change is needed and provide a clear "before and after" example if possible.
 
         **5. Final Summary & Verdict:**
-        - Conclude with a summary of the resume's effectiveness and provide a final verdict on its readiness for job applications.
+          - Conclude with a summary of the resume's effectiveness for the target role and provide a final verdict on its readiness for job applications.
 
         **Resume Content to Review:**
-        ${pdfData.text}`;
+        ${pdfData.text}
+        `;
 
     // 5. Generate AI response
     const response = await AI.chat.completions.create({
@@ -359,4 +361,3 @@ export const resumeReview = async (req, res) => {
     }
   }
 };
-

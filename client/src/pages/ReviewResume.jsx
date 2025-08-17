@@ -1,13 +1,43 @@
 import { FileText, Sparkles } from "lucide-react";
 import React, { useState } from "react";
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+import Markdown from "react-markdown";
 
 const ReviewResume = () => {
   const [input, setInput] = useState("");
+  const [targetRole, setTargetRole] = useState("");
+  const [targetIndustry, setTargetIndustry] = useState("");
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
+
+  const { getToken } = useAuth();
+  
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append("resume", input);
+      formData.append("targetRole", targetRole);
+      formData.append("targetIndustry", targetIndustry);
+
+      const { data } = await axios.post("/api/ai/resume-review", formData, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+
+      if (data.success) {
+        setContent(data.content);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+    setLoading(false);
   };
 
   return (
@@ -40,6 +70,30 @@ const ReviewResume = () => {
             Supported format: PDF. Upload your resume for review.
           </p>
 
+          <label className="mt-2 text-sm font-medium text-slate-700">
+            Target Role
+          </label>
+          <input
+            onChange={(e) => setTargetRole(e.target.value)}
+            type="text"
+            value={targetRole}
+            className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300"
+            placeholder="e.g., Software Engineer"
+            required
+          />
+
+          <label className="mt-2 text-sm font-medium text-slate-700">
+            Target Industry
+          </label>
+          <input
+            onChange={(e) => setTargetIndustry(e.target.value)}
+            type="text"
+            value={targetIndustry}
+            className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300"
+            placeholder="e.g., Technology"
+            required
+          />
+
           <button
             disabled={loading}
             className="w-full flex justify-center items-center gap-2 mt-8 py-3 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-sky-500 to-cyan-600 hover:opacity-90 transition"
@@ -54,14 +108,14 @@ const ReviewResume = () => {
         </form>
 
         {/* Right Panel */}
-        <div className="flex flex-col p-6 bg-white rounded-2xl border border-slate-200 shadow-md hover:shadow-lg transition h-full">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col p-6 bg-white rounded-2xl border border-slate-200 shadow-md hover:shadow-lg transition h-full overflow-hidden">
+          <div className="flex items-center gap-3 mb-4 flex-shrink-0">
             <FileText className="w-5 h-5 text-cyan-600" />
             <h1 className="text-xl font-semibold text-sky-700">Results</h1>
           </div>
 
           {!content ? (
-            <div className="flex-1 flex flex-col justify-center items-center text-slate-400 text-center">
+            <div className="flex-1 flex flex-col justify-center items-center text-slate-400 text-center overflow-hidden">
               <FileText className="w-10 h-10 mb-3 text-slate-400" />
               <p className="text-sm max-w-sm">
                 Upload a PDF to review your resume.
