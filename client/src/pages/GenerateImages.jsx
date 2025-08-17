@@ -1,5 +1,10 @@
 import { Image, Sparkles } from "lucide-react";
 import React, { useState } from "react";
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const GenerateImages = () => {
   const imageStyle = [
@@ -19,8 +24,31 @@ const GenerateImages = () => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
+  const { getToken } = useAuth();
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    try {
+      setLoading(true);
+
+      const prompt = `Generate an image of ${input} in the style ${selectedStyle}`;
+
+      const { data } = await axios.post(
+        "/api/ai/generate-image",
+        { prompt, publish },
+        { headers: { Authorization: `Bearer ${await getToken()}` } }
+      );
+
+      if (data.success) {
+        setContent(data.content);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      const msg = error.response?.data?.message || error.message;
+      toast.error(msg);
+    }
+    setLoading(false);
   };
 
   return (
@@ -113,9 +141,11 @@ const GenerateImages = () => {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto pr-2 text-sm text-slate-700">
-              <div className="reset-tw">
-                <Markdown>{content}</Markdown>
-              </div>
+              <img
+                src={content}
+                alt="Generated"
+                className="max-w-full rounded-lg shadow-md"
+              />
             </div>
           )}
         </div>

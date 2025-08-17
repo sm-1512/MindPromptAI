@@ -154,7 +154,7 @@ export const generateImage = async (req, res) => {
     `;
 
     // 4. Send response
-    return res.status(200).json({ success: true, secure_url });
+    return res.status(200).json({ success: true, content: secure_url });
   } catch (error) {
     console.error("generateTitle error:", error);
     return res.status(500).json({
