@@ -20,7 +20,7 @@ const Navbar = () => {
           <img
             src={assets.logo}
             alt="logo"
-            className="w-28 sm:w-36 transition-transform duration-300 hover:scale-105"
+            className="w-24 sm:w-36 transition-transform duration-300 hover:scale-105"
           />
         </div>
 
@@ -46,10 +46,7 @@ const Navbar = () => {
             </button>
           )}
 
-          {/* Mobile Menu Button */}
-          <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <Menu className="w-6 h-6 text-gray-700" />
-          </button>
+        
         </div>
       </nav>
     </header>
