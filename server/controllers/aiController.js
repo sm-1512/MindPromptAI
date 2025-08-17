@@ -3,6 +3,8 @@ import sql from "../configs/db.js";
 import { clerkClient } from "@clerk/express";
 import axios from "axios";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
+import pdf from 'pdf-parse/lib/pdf-parse.js'
 
 const AI = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -143,7 +145,7 @@ export const generateImage = async (req, res) => {
       "binary"
     ).toString("base64")}`;
 
-    const {secure_url} = await cloudinary.uploader.upload(base64Image);
+    const { secure_url } = await cloudinary.uploader.upload(base64Image);
 
     // 3. Save creation to DB
     await sql`
@@ -166,7 +168,7 @@ export const generateImage = async (req, res) => {
 export const removeImageBackground = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const {image} = req.file;
+    const { image } = req.file;
     const { plan } = req; // values set in your auth middleware
 
     //No free_usage variables because it is only available for premium users
@@ -180,14 +182,14 @@ export const removeImageBackground = async (req, res) => {
     }
 
     // 2. Call AI model to remove background
-    const {secure_url} = await cloudinary.uploader.upload(image.path, {
-            transformation: [
-                {
-                    effect: 'background_removal',
-                    background_removal: 'remove_the_background'
-                }
-            ]
-        })
+    const { secure_url } = await cloudinary.uploader.upload(image.path, {
+      transformation: [
+        {
+          effect: "background_removal",
+          background_removal: "remove_the_background",
+        },
+      ],
+    });
 
     // 3. Save creation to DB
     await sql`
@@ -209,8 +211,8 @@ export const removeImageBackground = async (req, res) => {
 export const removeImageObject = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const {object} = req.body;
-    const {image} = req.file;
+    const { object } = req.body;
+    const { image } = req.file;
     const { plan } = req; // values set in your auth middleware
 
     //No free_usage variables because it is only available for premium users
@@ -224,11 +226,11 @@ export const removeImageObject = async (req, res) => {
     }
 
     // 2. Call AI model to remove background
-    const {public_id} = await cloudinary.uploader.upload(image.path);
+    const { public_id } = await cloudinary.uploader.upload(image.path);
 
     const imageUrl = cloudinary.url(public_id, {
-        transformation: [{effect: `gen_remove:${object}`}],
-        resource_type: 'image'
+      transformation: [{ effect: `gen_remove:${object}` }],
+      resource_type: "image",
     });
 
     // 3. Save creation to DB
@@ -245,6 +247,116 @@ export const removeImageObject = async (req, res) => {
       message: "Something went wrong while generating the image.",
       error: error.message,
     });
+  }
+};
+
+
+export const resumeReview = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { plan } = req;
+    const resume = req.file;
+
+    // 1. Check if user has premium plan
+    if (plan !== "premium") {
+      return res.status(403).json({
+        success: false,
+        message: "This feature is only available for premium users.",
+      });
+    }
+
+    // 2. Validate resume file
+    if (!resume) {
+      return res.status(400).json({
+        success: false,
+        message: "No resume file uploaded.",
+      });
+    }
+
+    if (resume.size > 5 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: "Resume file size exceeds the 5MB limit.",
+      });
+    }
+
+    if (!resume.mimetype.includes("pdf")) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file type. Please upload a PDF resume.",
+      });
+    }
+
+    // 3. Extract text from PDF
+    const dataBuffer = fs.readFileSync(resume.path);
+    const pdfData = await pdf(dataBuffer);
+
+    // 4. Create AI prompt
+    const prompt = `
+        Act as an expert Career Coach and professional Resume Reviewer. Your task is to conduct a comprehensive review of the following resume.
+
+        Please provide a detailed, constructive critique organized into the following sections. Ensure your feedback is specific, actionable, and tailored.
+
+        **1. First Impressions & ATS Compatibility:**
+        - Provide a brief, overall impression of the resume. Is it professional, clear, and easy to read?
+        - Analyze its compatibility with Applicant Tracking Systems (ATS). Comment on formatting, keywords, and overall structure.
+
+        **2. Section-by-Section Analysis:**
+        - **Contact Information:** Is it complete and professional?
+        - **Skills:** Are the skills relevant and well-organized? Is there a good mix of languages, frameworks, and tools?
+        - **Professional Experience:**
+            - Are the descriptions written with strong, impactful action verbs?
+            - Are achievements quantified with specific metrics or results (e.g., "Increased X by Y%", "Reduced Z by N hours")??
+        - **Projects:**
+            - Do the project descriptions clearly state the technologies used (Tech Stack)?
+            - Do they effectively demonstrate skills relevant?
+            - Are links to GitHub or live demos included and valuable?
+        - **Education & Certifications:** Is this section clear, concise, and supportive of the candidate's goals?
+
+        **3. Key Strengths:**
+        - Based on the analysis, list the top 3-5 strengths of this resume that make the candidate a strong applicant.
+
+        **4. Actionable Areas for Improvement:**
+        - Provide a numbered list of the most critical, actionable recommendations for improvement. For each point, explain *why* the change is needed and provide a clear "before and after" example if possible.
+
+        **5. Final Summary & Verdict:**
+        - Conclude with a summary of the resume's effectiveness and provide a final verdict on its readiness for job applications.
+
+        **Resume Content to Review:**
+        ${pdfData.text}`;
+
+    // 5. Generate AI response
+    const response = await AI.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
+
+    const content = response.choices[0].message.content;
+
+    // 6. Save to database
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type) 
+      VALUES (${userId}, 'Resume Review Request', ${content}, 'resume-review')
+    `;
+
+    // 7. Return success response
+    return res.status(200).json({
+      success: true,
+      content,
+    });
+  } catch (error) {
+    console.error("Resume review error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while reviewing the resume.",
+    });
+  } finally {
+    // 8. Clean up uploaded file if necessary
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path); // remove temp file to avoid clutter
+    }
   }
 };
 
