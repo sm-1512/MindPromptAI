@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import { Edit, Sparkles } from "lucide-react";
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
+import Markdown from "react-markdown";
+
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const WriteArticle = () => {
   const articleLength = [
@@ -13,8 +19,24 @@ const WriteArticle = () => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
+  const {getToken} = useAuth();
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    try {
+      setLoading(true);
+      const prompt = `Write an article about ${input} in ${selectedLength.text}`;
+      const {data} = await axios.post('/api/ai/generate-article',{prompt, length: selectedLength.length}, {headers:{Authorization:`Bearer ${await getToken()}`}});
+
+      if(data.success){
+        setContent(data.content);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+    setLoading(false);
   };
 
   return (
@@ -70,14 +92,14 @@ const WriteArticle = () => {
         </form>
 
         {/* Right Panel */}
-        <div className="flex flex-col p-6 bg-white rounded-xl border border-gray-200 shadow-sm h-full">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col p-6 bg-white rounded-xl border border-gray-200 shadow-sm h-full overflow-hidden">
+          <div className="flex items-center gap-3 mb-4 flex-shrink-0">
             <Edit className="w-5 h-5 text-blue-600" />
             <h1 className="text-xl font-semibold">Generated Article</h1>
           </div>
 
           {!content ? (
-            <div className="flex-1 flex flex-col justify-center items-center text-gray-400 text-center">
+            <div className="flex-1 flex flex-col justify-center items-center text-gray-400 text-center overflow-hidden">
               <Edit className="w-10 h-10 mb-3" />
               <p className="text-sm max-w-sm">
                 Enter a topic and click <b>“Generate Article”</b> to get started
