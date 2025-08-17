@@ -1,0 +1,90 @@
+# --------------------------------
+# Node
+# --------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --------------------------------
+# Build / Dist
+# --------------------------------
+dist/
+build/
+.cache/
+.next/
+out/
+.tmp/
+temp/
+*.tsbuildinfo
+
+# --------------------------------
+# Logs
+# --------------------------------
+logs
+*.log
+*.log.*
+log.txt
+
+# --------------------------------
+# Runtime data
+# --------------------------------
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# --------------------------------
+# Environment files
+# --------------------------------
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# (ignores env files inside client/ and server/ too)
+client/.env
+client/.env.*
+server/.env
+server/.env.*
+
+# --------------------------------
+# OS files
+# --------------------------------
+.DS_Store
+Thumbs.db
+
+# --------------------------------
+# Editor / IDE
+# --------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# --------------------------------
+# Coverage / Testing
+# --------------------------------
+coverage/
+.nyc_output/
+.cypress/
+playwright-report/
+test-results/
+
+# --------------------------------
+# Misc
+# --------------------------------
+*.tgz
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Local env configs
+*.local
