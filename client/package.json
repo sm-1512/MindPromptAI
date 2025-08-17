@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "postinstall": "npx --yes install-lightningcss"
+    "postinstall": "npm rebuild lightningcss --update-binary"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.42.1",
