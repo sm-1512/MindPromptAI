@@ -206,3 +206,45 @@ export const removeImageBackground = async (req, res) => {
   }
 };
 
+export const removeImageObject = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const {object} = req.body;
+    const {image} = req.file;
+    const { plan } = req; // values set in your auth middleware
+
+    //No free_usage variables because it is only available for premium users
+
+    // 1. Check usage limits for free users
+    if (plan !== "premium") {
+      return res.status(403).json({
+        success: false,
+        message: "This feature is only available for premium users.",
+      });
+    }
+
+    // 2. Call AI model to remove background
+    const {public_id} = await cloudinary.uploader.upload(image.path);
+
+    const imageUrl = cloudinary.url(public_id, {
+        transformation: [{effect: `gen_remove:${object}`}],
+        resource_type: 'image'
+    });
+
+    // 3. Save creation to DB
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type) 
+      VALUES (${userId}, ${`Removed ${object}`} , ${imageUrl}, 'image')`;
+
+    // 4. Send response
+    return res.status(200).json({ success: true, secure_url: imageUrl });
+  } catch (error) {
+    console.error("generateTitle error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while generating the image.",
+      error: error.message,
+    });
+  }
+};
+
